@@ -14,6 +14,10 @@ HTTP/1.0" 302 528 "-" "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US;
 rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6"
 """
 
+__author__ = """Andrew Fillenwarth. Thanks to Janelle Kuhns for
+                helping me with the correct URL and thanks as
+                always to Daniel for the Study Halls and everything else!"""
+
 import os
 import re
 import sys
@@ -26,19 +30,23 @@ def read_urls(filename):
     extracting the hostname from the filename itself, sorting
     alphabetically in increasing order, and screening out duplicates.
     """
-    first_part = 'http://code.google.com'
+    first_part = 'http://code.google.com/'
     puzzle_urls = []
     with open(filename) as logs:
-        pattern = re.compile(r'\S+.jpg')
+        pattern = re.compile(r'edu\S+.jpg')
+        sort_pattern = re.compile(r'edu\S+(\w{4}).jpg')
         line_list = logs.readlines()
         for line in line_list:
             match = pattern.findall(line)
+            # print(match)
             if match:
-                puzzle_urls.append(first_part + ''.join(match))
+                final = ''.join(match)
+                puzzle_urls.append(first_part + final)
         puzzle_urls = list(set(puzzle_urls))
-        puzzle_urls.sort()
-        # print(puzzle_urls)
-    return puzzle_urls
+        # sort list based on specified group
+        sorted_urls = sorted(
+            puzzle_urls, key=lambda x: sort_pattern.search(x).group(1))
+    return sorted_urls
 
 
 def download_images(img_urls, dest_dir):
@@ -63,7 +71,7 @@ def download_images(img_urls, dest_dir):
         # download the image from each url in the list
         for url in img_urls:
             img_name = f'img{count}.jpg'
-            urllib.request.urlretrieve(url, img_name)  
+            urllib.request.urlretrieve(url, img_name)
             count += 1
             f.write(f'<img src="{os.path.abspath(img_name)}">')
         f.write(template_end)
@@ -97,7 +105,9 @@ def main(args):
     else:
         print('\n'.join(img_urls))
 
-download_images(read_urls('animal_code.google.com'), "img_dir")
+
+# download_images(read_urls('place_code.google.com'), 'imgdir')
+
 
 if __name__ == '__main__':
     main(sys.argv[1:])
