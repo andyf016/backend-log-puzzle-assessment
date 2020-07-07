@@ -26,8 +26,19 @@ def read_urls(filename):
     extracting the hostname from the filename itself, sorting
     alphabetically in increasing order, and screening out duplicates.
     """
-    # +++your code here+++
-    pass
+    first_part = 'http://code.google.com'
+    puzzle_urls = []
+    with open(filename) as logs:
+        pattern = re.compile(r'\S+.jpg')
+        line_list = logs.readlines()
+        for line in line_list:
+            match = pattern.findall(line)
+            if match:
+                puzzle_urls.append(first_part + ''.join(match))
+        puzzle_urls = list(set(puzzle_urls))
+        puzzle_urls.sort()
+        # print(puzzle_urls)
+    return puzzle_urls
 
 
 def download_images(img_urls, dest_dir):
@@ -38,8 +49,15 @@ def download_images(img_urls, dest_dir):
     to show each local image file.
     Creates the directory if necessary.
     """
-    # +++your code here+++
-    pass
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+    os.chdir(dest_dir)
+    count = 0
+    for url in img_urls:
+        urllib.request.urlretrieve(url, f'img{count}.jpg')
+        count += 1
+
+    return
 
 
 def create_parser():
@@ -69,6 +87,7 @@ def main(args):
     else:
         print('\n'.join(img_urls))
 
+download_images(read_urls('animal_code.google.com'), "img_dir")
 
 if __name__ == '__main__':
     main(sys.argv[1:])
