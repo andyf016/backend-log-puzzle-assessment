@@ -49,14 +49,24 @@ def download_images(img_urls, dest_dir):
     to show each local image file.
     Creates the directory if necessary.
     """
+    template_start = "<html><body>"
+    template_end = "</body></html>"
+    # create dest_dir if it does not exist
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
     os.chdir(dest_dir)
+    # set counter for image names
     count = 0
-    for url in img_urls:
-        urllib.request.urlretrieve(url, f'img{count}.jpg')
-        count += 1
-
+    # create index.html and open it for writing
+    with open('index.html', 'w') as f:
+        f.write(template_start)
+        # download the image from each url in the list
+        for url in img_urls:
+            img_name = f'img{count}.jpg'
+            urllib.request.urlretrieve(url, img_name)  
+            count += 1
+            f.write(f'<img src="{os.path.abspath(img_name)}">')
+        f.write(template_end)
     return
 
 
